@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BigBrother Example</title>
+    <script src="BigBrother.js"></script>
+    <script>
+      var app = Elm.BigBrother.worker();
+      
+      app.ports.log.subscribe(function(word) {
+          console.log(word);
+      });
+    </script>
+  </head>
+
+  <body>
+      <div class="main" style="display:none"></div>
+  </body>
+</html>
