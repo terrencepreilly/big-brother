@@ -1,5 +1,6 @@
 import redis
 
+from django.utils import timezone
 from django.conf import settings
 
 from rest_framework.response import Response
@@ -15,7 +16,8 @@ rstore = redis.StrictRedis(
 
 @api_view(['POST'])
 def ping(request):
-    data = dict(request.data)
+    data = {'timestamp': timezone.now()}
+    data.update(request.data)
     username = data.get('username', None)
     site = data.get('site', None)
     if username is None or site is None:
