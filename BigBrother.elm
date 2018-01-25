@@ -28,6 +28,9 @@ type alias User =
     { username : String
     }
 
+-- TODO: A port should be added to update the message.
+-- That way, apps using the backend's data can display
+-- what users are doing in real time.
 type alias Model =
     { user : User
     , site : String
