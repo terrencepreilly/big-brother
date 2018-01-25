@@ -2,15 +2,15 @@ port module BigBrother exposing (..)
 
 {-| A utility which continually pings a redis service. -}
 
-import Platform exposing ( program, Program )
+import Platform exposing ( programWithFlags, Program )
 import Time exposing ( Time, second )
 import Json.Encode as Encode
 import Json.Decode as Decode
 import Http
 
-main : Program Never Model Msg
+main : Program Flags Model Msg
 main =
-    program
+    programWithFlags
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -18,43 +18,55 @@ main =
 
 -- MODEL
 
+type alias Flags =
+    { username : String
+    , site : String
+    , initialMessage : String
+    }
+
 type alias User =
     { username : String
     }
 
-
-userEncoder : User -> Encode.Value
-userEncoder user =
-    Encode.object [("username", Encode.string user.username)]
-
-userDecoder : Decode.Decoder User
-userDecoder =
-    Decode.map User
-            (Decode.field "username" Decode.string)
-
-
 type alias Model =
     { user : User
+    , site : String
+    , message : String
     }
 
-init : (Model, Cmd Msg)
-init = 
-    ( { user = User "Samantha" }
+modelEncoder : Model -> Encode.Value
+modelEncoder model =
+    Encode.object
+        [ ("username", Encode.string model.user.username)
+        , ("site", Encode.string model.site)
+        , ("message", Encode.string model.message)
+        ]
+
+init : Flags -> (Model, Cmd Msg)
+init flags = 
+    (
+        { user = User flags.username
+        , site = flags.site
+        , message = flags.initialMessage
+        }
     , Cmd.none
     )
 
 -- UPDATE
 type Msg
     = Tick Time
-    | Noop (Result Http.Error User)
+    | Noop (Result Http.Error String)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
---        Tick newTime -> (model, log "Hello!")
         Tick newTime -> (model, ping model)
-        Noop (Ok user) -> (model, Cmd.none)
-        Noop (Err _) -> (model, Cmd.none)
+        Noop (Ok message) -> (model, Cmd.none)
+        Noop (Err message) ->
+            let
+                errorMessage = "Failed ping: " ++ toString message
+            in
+                (model, log errorMessage)
 
 
 -- PORTS
@@ -68,10 +80,14 @@ subscriptions model =
     Time.every (5 * second) Tick
 
 
+{-| Send a ping to the backend, discarding the result if it
+ - succeeds, otherwise sending the result to the JSON port,
+ - log, if it does not.
+ -}
 ping : Model -> Cmd Msg
 ping model =
     let
-        url = "http://localhost:3000/ping"
-        body = Http.jsonBody <| userEncoder model.user
+        url = "http://localhost:8000/ping"
+        body = Http.jsonBody <| modelEncoder model
     in
-        Http.send Noop (Http.post url body userDecoder)
+        Http.send Noop (Http.post url body Decode.string)

@@ -4,7 +4,11 @@
     <title>BigBrother Example</title>
     <script src="BigBrother.js"></script>
     <script>
-      var app = Elm.BigBrother.worker();
+      var app = Elm.BigBrother.worker({
+        username: 'samantha',
+        site: 'lesswrong.com',
+        initialMessage: ''
+      });
       
       app.ports.log.subscribe(function(word) {
           console.log(word);
