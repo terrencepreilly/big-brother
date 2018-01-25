@@ -11,7 +11,7 @@ in (and what they up to.)
 
 ## Usage
 
-First, you must have [Elm](elm-lang.org) and Make,
+First, you must have [Elm](http://elm-lang.org) and Make,
 [Docker](https://www.docker.com/), and
 [docker-compose](https://docs.docker.com/compose/) installed.
 
