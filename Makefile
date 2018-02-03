@@ -1,5 +1,5 @@
-BigBrother.js: BigBrother.elm
-	elm-make BigBrother.elm --output=BigBrother.js
+BigBrother.js: script/BigBrother.elm
+	elm-make script/BigBrother.elm --output=BigBrother.js
 
 .PHONY: clean
 clean:

@@ -8,6 +8,8 @@ import Json.Encode as Encode
 import Json.Decode as Decode
 import Http
 
+import UrlJoin exposing ( urlJoin)
+
 main : Program Flags Model Msg
 main =
     programWithFlags
@@ -22,6 +24,7 @@ type alias Flags =
     { username : String
     , site : String
     , initialMessage : String
+    , host : Maybe String
     }
 
 type alias User =
@@ -35,6 +38,7 @@ type alias Model =
     { user : User
     , site : String
     , message : String
+    , host : String
     }
 
 modelEncoder : Model -> Encode.Value
@@ -47,13 +51,17 @@ modelEncoder model =
 
 init : Flags -> (Model, Cmd Msg)
 init flags = 
-    (
-        { user = User flags.username
-        , site = flags.site
-        , message = flags.initialMessage
-        }
-    , Cmd.none
-    )
+    let
+        host = "http://localhost:8000"  
+    in
+        (
+            { user = User flags.username
+            , site = flags.site
+            , message = flags.initialMessage
+            , host = host
+            }
+        , Cmd.none
+        )
 
 -- UPDATE
 type Msg
@@ -90,7 +98,7 @@ subscriptions model =
 ping : Model -> Cmd Msg
 ping model =
     let
-        url = "http://localhost:8000/ping"
+        url = urlJoin model.host "ping"
         body = Http.jsonBody <| modelEncoder model
     in
         Http.send Noop (Http.post url body Decode.string)
