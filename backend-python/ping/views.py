@@ -31,10 +31,17 @@ def ping(request):
     return Response('Success')
 
 
+def _convert_data_from_binary(data):
+    ret = dict()
+    for key in data:
+        ret[key.decode()] = data[key].decode()
+    return ret
+
+
 @api_view(['GET'])
 def report(request, site):
     keys = rstore.keys(f'{site}.*')
-    users = list()
+    userdata = dict()
     current_time = timezone.now()
     duration = int(request.GET.get('duration', '10'))
     for key in keys:
@@ -45,8 +52,11 @@ def report(request, site):
         if timestamp is None:
             continue
         timestamp = parse_datetime(timestamp.decode())
-        if current_time - timestamp < timedelta(seconds=duration):
-            username = data.get(b'username', None)
-            if username is not None:
-                users.append(username)
-    return Response({'users': users})
+        if current_time - timestamp > timedelta(seconds=duration):
+            continue
+        username = data.get(b'username', None)
+        if username is None:
+            continue
+        username = username.decode()
+        userdata[username] = _convert_data_from_binary(data)
+    return Response(userdata)
