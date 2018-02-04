@@ -3,7 +3,10 @@
   <head>
     <title>BigBrother Example</title>
     <script src="BigBrother.js"></script>
+    <script src="BigBrotherReporter.js"></script>
     <script>
+      /* The below script should be on whatever the client
+         is accessing which you would like to track. */
       var app = Elm.BigBrother.worker({
         username: 'samantha',
         site: 'lesswrong.com',
@@ -14,10 +17,31 @@
       app.ports.log.subscribe(function(word) {
           console.log(word);
       });
+
+      /* The below script should be included wherever you
+         are reporting on the current traffic/messages/etc. */
+      var node = document.getElementById('report-output');
+      var app = Elm.BigBrotherReporter.embed(node);
     </script>
+<style>
+html {
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+body {
+    width: 100%;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+#report-output {
+    margin: auto;
+}
+</style>
   </head>
 
   <body>
-      <div class="main" style="display:none"></div>
+      <div id="report-output"></div>
   </body>
 </html>

@@ -66,10 +66,10 @@ Some task which have to be done before this is fully usable:
 - [ ] Add a port which allows users to change the message sent.
 - [x] Add a flag member which tells where the backend server is
       to be found.
-- [ ] Add an endpoint to backend-python which, given site, returns:
+- [x] Add an endpoint to backend-python which, given site, returns:
   - [x] all users
-  - [ ] all timestamps
-  - [ ] all messages
+  - [x] all timestamps
+  - [x] all messages
 
 Some possible features in the future:
 

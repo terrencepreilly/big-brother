@@ -8,7 +8,11 @@ import Json.Encode as Encode
 import Json.Decode as Decode
 import Http
 
-import UrlJoin exposing ( urlJoin)
+import UrlJoin exposing (urlJoin)
+import Message exposing
+    ( Message
+    , messageEncoder
+    )
 
 main : Program Flags Model Msg
 main =
@@ -27,41 +31,34 @@ type alias Flags =
     , host : Maybe String
     }
 
-type alias User =
-    { username : String
+type alias Model =
+    { message : Message
+    , host : String
     }
 
 -- TODO: A port should be added to update the message.
 -- That way, apps using the backend's data can display
 -- what users are doing in real time.
-type alias Model =
-    { user : User
-    , site : String
-    , message : String
-    , host : String
-    }
 
+-- Change by just callling message encoder on message.
 modelEncoder : Model -> Encode.Value
-modelEncoder model =
-    Encode.object
-        [ ("username", Encode.string model.user.username)
-        , ("site", Encode.string model.site)
-        , ("message", Encode.string model.message)
-        ]
+modelEncoder model = messageEncoder model.message
 
 init : Flags -> (Model, Cmd Msg)
 init flags = 
     let
         host = "http://localhost:8000"  
-    in
-        (
-            { user = User flags.username
+        message_ =
+            { username = flags.username
             , site = flags.site
             , message = flags.initialMessage
+            }
+        model =
+            { message = message_
             , host = host
             }
-        , Cmd.none
-        )
+    in
+        ( model , Cmd.none )
 
 -- UPDATE
 type Msg
@@ -75,9 +72,9 @@ update msg model =
         Noop (Ok message) -> (model, Cmd.none)
         Noop (Err message) ->
             let
-                errorMessage = "Failed ping: " ++ toString message
+                errorModel = "Failed ping: " ++ toString message
             in
-                (model, log errorMessage)
+                (model, log errorModel)
 
 
 -- PORTS
