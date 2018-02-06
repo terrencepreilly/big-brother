@@ -40,7 +40,7 @@ def _convert_data_from_binary(data):
 
 @api_view(['GET'])
 def report(request, site):
-    keys = rstore.keys(f'{site}.*')
+    keys = rstore.keys(f'{site}*')
     userdata = dict()
     current_time = timezone.now()
     duration = int(request.GET.get('duration', '10'))

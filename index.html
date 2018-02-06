@@ -20,8 +20,21 @@
 
       /* The below script should be included wherever you
          are reporting on the current traffic/messages/etc. */
-      var node = document.getElementById('report-output');
-      var app = Elm.BigBrotherReporter.embed(node);
+      var node = null;
+      var reportApp = null;
+
+      // Of course, we have to wait until the DOM is ready.
+      document.addEventListener("DOMContentLoaded", function() {
+        node = document.getElementById('report-output');
+        reportApp = Elm.BigBrotherReporter.embed(node, {
+            host: 'http://localhost:8000',
+            site: 'lesswrong.com',
+            duration: 8,
+        });
+        reportApp.ports.log.subscribe(function(word) {
+            console.log(word);
+        });
+      });
     </script>
 <style>
 html {

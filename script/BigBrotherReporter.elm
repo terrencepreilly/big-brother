@@ -1,11 +1,26 @@
-module BigBrotherReporter exposing (..)
+port module BigBrotherReporter exposing (..)
+
+import Http
+import Time exposing
+    ( Time
+    , second
+    )
 
 import Html exposing
     ( Html
     , div
+    , text
     )
+import Json.Decode as Decode
 
-main : Program Flags Model msg
+import Message exposing
+    ( Message
+    , messageDecoder
+    , messageView
+    )
+import UrlJoin exposing ( urlJoin )
+
+main : Program Flags Model Msg
 main = Html.programWithFlags
     { init = init
     , view = view
@@ -16,27 +31,87 @@ main = Html.programWithFlags
 
 -- MODEL
 type alias Flags =
-    { site : String
+    { host: String
+    , site : String
+    , duration : Int
     }
-type alias Model = Int
+-- TODO: Remove debug string.
+type alias Model =
+    { host : String
+    , site : String
+    , duration : Int
+    , userData : List Message 
+    , debug : String
+    }
 
 init : Flags -> (Model, Cmd msg)
-init flags = (5, Cmd.none)
+init flags =
+    ( Model
+        flags.host
+        flags.site
+        flags.duration
+        []
+        "Debug String"
+    , Cmd.none
+    )
 
 
 -- VIEW
 
 view : Model -> (Html msg)
-view model = div [] []
+view model =
+    div []
+        [ text model.debug ]
+--        (List.map messageView model.userData)
 
 
 -- UPDATE
+type Msg
+    = Tick Time
+    | UpdateUserData (Result Http.Error (List Message))
 
-update : msg -> Model -> (Model, Cmd msg)
-update msg model = (model, Cmd.none)
+update : Msg -> Model -> (Model, Cmd Msg)
+update msg model =
+    case msg of
+        Tick time ->
+            (model, getUserData model)
+        UpdateUserData (Ok newUserData) ->
+            let
+                debug = "Howdy"
+                newModel =
+                    { model
+                        | userData = newUserData
+                        , debug = debug
+                        }
+            in
+                (newModel, Cmd.none)
+        UpdateUserData (Err error) ->
+            let
+                errorModel = toString error
+            in
+                (model, log errorModel)
 
+-- PORTS
+port log : String -> Cmd msg
 
 -- SUBSCRIPTIONS
 
-subscriptions : Model -> Sub msg
-subscriptions model = Sub.none
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Time.every (5 * second) Tick
+
+
+-- REQUESTS
+
+getUserData : Model -> Cmd Msg
+getUserData model =
+    let
+        baseUrl = List.foldr urlJoin ""
+            [ model.host
+            , "report"
+            , model.site
+            ]
+        url = baseUrl ++ "?duration=" ++ toString model.duration
+        decoder = Decode.list messageDecoder
+    in
+        Http.send UpdateUserData <| Http.get url decoder
