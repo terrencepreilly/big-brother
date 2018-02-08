@@ -1,4 +1,4 @@
-module Example exposing (..)
+module BigBrotherTests exposing (..)
 
 import Test exposing (..)
 import Expect
