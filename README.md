@@ -62,6 +62,7 @@ the Django CORS whitelist.  This is located in the file
 
 The relevant files for customizing/using *BigBrother* are as
 follows:
+```
     .
     ├── backend-python/
     │   ├── backend/
@@ -82,21 +83,16 @@ follows:
     │   ├── BigBrotherTests.elm
     │   └── ...
     └── ...
+```
 
 A description of the purpose of each follows:
 - `backend-python/backend/settins.py`: The settings file for the backend.
-  The most relevant setting is `CORS_ORIGIN_WHITELIST`.  Currently, it
-  only contains the string, "localhost:8080".  Whichever origins you're
-  using the scripts from have to be included here.  For example, if I
-  were to include this script in *www.example.com*, I would put
-```
-    CORS_ORIGIN_WHITELIST = (
-        "www.example.com",
-    )
-```
-  See [django-cors-headers](https://github.com/ottoyiu/django-cors-headers)
-  for details.
-
+  The most relevant setting is `CORS_ORIGIN_WHITELIST`. See
+  [django-cors-headers](https://github.com/ottoyiu/django-cors-headers)
+  for details.  Currently, it only contains the string, "localhost:8080".
+  Whichever origins you're using the scripts from have to be included here.
+  For example, if I were to include this script in *www.example.com*, I
+  would put `CORS_ORIGIN_WHITELIST = ( "www.example.com",)`.
   If you are not running on Docker, the redis settings are included
   here (`REDIS_HOST`, `REDIS_PORT`, and `REDIS_DB` will have to be
   defined.)
