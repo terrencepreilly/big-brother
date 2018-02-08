@@ -1,11 +1,11 @@
 port module BigBrotherReporter exposing (..)
 
+import Dict
 import Http
 import Time exposing
     ( Time
     , second
     )
-
 import Html exposing
     ( Html
     , div
@@ -40,7 +40,7 @@ type alias Model =
     { host : String
     , site : String
     , duration : Int
-    , userData : List Message 
+    , userData : Dict.Dict String Message 
     , debug : String
     }
 
@@ -50,7 +50,7 @@ init flags =
         flags.host
         flags.site
         flags.duration
-        []
+        Dict.empty
         "Debug String"
     , Cmd.none
     )
@@ -61,14 +61,15 @@ init flags =
 view : Model -> (Html msg)
 view model =
     div []
-        [ text model.debug ]
---        (List.map messageView model.userData)
+        (model.userData
+            |> Dict.values
+            |> List.map messageView)
 
 
 -- UPDATE
 type Msg
     = Tick Time
-    | UpdateUserData (Result Http.Error (List Message))
+    | UpdateUserData (Result Http.Error (Dict.Dict String Message))
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -112,6 +113,6 @@ getUserData model =
             , model.site
             ]
         url = baseUrl ++ "?duration=" ++ toString model.duration
-        decoder = Decode.list messageDecoder
+        decoder = Decode.dict messageDecoder
     in
         Http.send UpdateUserData <| Http.get url decoder

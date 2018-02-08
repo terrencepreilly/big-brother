@@ -10,7 +10,7 @@
       var app = Elm.BigBrother.worker({
         username: 'samantha',
         site: 'lesswrong.com',
-        initialMessage: '',
+        initialMessage: 'Hello',
         host: null,
       });
       
@@ -47,6 +47,12 @@ body {
     flex-grow: 1;
     display: flex;
     align-items: center;
+}
+.username {
+    margin-right: 10px;
+    font-weight: bold;
+}
+.message {
 }
 #report-output {
     margin: auto;
