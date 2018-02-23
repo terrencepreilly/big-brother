@@ -47,7 +47,9 @@ modelEncoder model = messageEncoder model.message
 init : Flags -> (Model, Cmd Msg)
 init flags = 
     let
-        host = "http://localhost:8000"  
+        host = case flags.host of
+            Just value -> value
+            Nothing -> "http://localhost:8000"  
         message_ =
             { username = flags.username
             , site = flags.site
